@@ -13,9 +13,31 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+
+
+from django.conf import settings
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
+from django.views.generic.base import TemplateView
+from django.conf.urls import url
+from pentagram.views import comments, photos, users, like
+from rest_framework.authtoken import views as authtoken_views
+
+
+
 
 urlpatterns = [
+
+
+    url(r'^api/v1/login/$', authtoken_views.obtain_auth_token),
+    url(r'^api/v1/users/$',users, name='users'),
+
     url(r'^admin/', admin.site.urls),
-]
+    url(r'^user/login', auth_views.login, {'template_name': 'login.html'}, name="login"),
+    url(r'^$', TemplateView.as_view(template_name='index.html'), name="homepage"),
+    url(r'^api/v1/photos/$',photos, name='photos'),
+    url(r'^api/v1/photos/(?P<id_photo>[0-9]*)/comments/$', comments, name='comments'),
+    url(r'^api/v1/photos/(?P<id_photo>[0-9]*)/like/$',like, name='like'),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
