@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import TemplateView
 from django.conf.urls import url
-from pentagram.views import comments, photos, users, like
+from pentagram.views import comments, photos, users, like, CustomObtainAuthToken
 from rest_framework.authtoken import views as authtoken_views
 
 
@@ -30,7 +30,7 @@ from rest_framework.authtoken import views as authtoken_views
 urlpatterns = [
 
 
-    url(r'^api/v1/login/$', authtoken_views.obtain_auth_token),
+    url(r'^api/v1/login/$', CustomObtainAuthToken.as_view()),
     url(r'^api/v1/users/$',users, name='users'),
 
     url(r'^admin/', admin.site.urls),

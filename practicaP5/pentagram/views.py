@@ -5,6 +5,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+
+
 
 from pentagram.models import Photo, Comment, Like
 from pentagram.serializers import UsersSerializer, PhotoSerializer, CommentSerializer
@@ -24,6 +28,7 @@ def users(request):
 
 
 @api_view(['GET', 'POST'])
+@permission_classes((AllowAny,))
 def photos(request):
     if request.method == 'GET':
         all_photos = Photo.objects.all()
@@ -39,6 +44,7 @@ def photos(request):
 
 
 @api_view(['GET', 'POST'])
+@permission_classes((AllowAny,))
 def comments(request, id_photo):
     if request.method == 'GET':
         all_comments = Comment.objects.filter(photo_id=id_photo)
@@ -53,6 +59,7 @@ def comments(request, id_photo):
 
 
 @api_view(['PUT'])
+@permission_classes((AllowAny,))
 def like(request, id_photo):
     if request.method =="PUT":
         id_user = request.user.id
@@ -64,6 +71,13 @@ def like(request, id_photo):
             add_like = Like(user_id=id_user, photo_id=id_photo)
             add_like.save()
             return Response (status=status.HTTP_202_ACCEPTED)
+
+class CustomObtainAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response ({'token': token.key, 'id': token.user_id})
+
 
 
 
